@@ -58,10 +58,10 @@ export class CourseComponent implements OnInit {
 
   ngOnInit() {
     const courseId = parseInt(this.route.snapshot.paramMap.get("courseId"));
-    this.course$ = this.coursesService.findCourseById(courseId).pipe(
+    this.course$ = this.coursesService.loadCourseById(courseId).pipe(
       startWith(null)
     );
-    this.lessons$ = this.coursesService.searchLessonsFromCourse(courseId).pipe(
+    this.lessons$ = this.coursesService.loadAllCourseLessons(courseId).pipe(
       startWith([])
     );
 

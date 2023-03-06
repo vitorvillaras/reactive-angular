@@ -1,66 +1,76 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, throwError } from "rxjs";
-import { Course, sortCoursesBySeqNo } from "../model/course";
-import { HttpClient } from "@angular/common/http";
-import { catchError, map, shareReplay, tap } from "rxjs/operators";
-import { MessagesService } from "./messages.service";
-import { Lesson } from "../model/lesson";
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Course} from '../model/course';
+import {Observable} from 'rxjs';
+import {map, shareReplay} from 'rxjs/operators';
+import {Lesson} from '../model/lesson';
 
-@Injectable({ providedIn: "root" })
+
+@Injectable({
+    providedIn:'root'
+})
 export class CoursesService {
-  constructor(
-    private http: HttpClient,
-  ) {}
 
-  loadAllCourses(): Observable<Course[]> {
-    return this.http.get<Course[]>("/api/courses").pipe(
-      map((res) => res["payload"].sort(sortCoursesBySeqNo)),
-      shareReplay(),
-      catchError((err) => {
-        return throwError(err);
-      })
-    );
-  }
+    constructor(private http:HttpClient) {
 
-  saveCourse(courseId: string, changes: Partial<Course>): Observable<any> {
-    return this.http.put(`/api/courses/${courseId}`, changes).pipe(
-      shareReplay(),
-      catchError((err) => {
-        console.log("Error saving course", err);
-        return throwError(err);
-      })
-    );
-  }
+    }
 
-  findCourseById(courseId: number): Observable<Course> {
-    return this.http.get<Course>(`/api/courses/${courseId}`).pipe(
-      shareReplay(),
-    );
-  }
+    loadCourseById(courseId:number): Observable<Course> {
+       return this.http.get<Course>(`/api/courses/${courseId}`)
+            .pipe(
+              shareReplay()
+            );
+    }
 
-  searchLessonsFromCourse(courseId: number): Observable<Lesson[]> {
-    return this.http.get<Lesson[]>('/api/lessons',
-    {
-      params: {
-        pageSize: '10000',
-        courseId: courseId.toString(),
-      }
-    }).pipe(
-      map(res => res['payload']),
-      shareReplay(),
-    )
-  }
+    loadAllCourseLessons(courseId:number): Observable<Lesson[]> {
+        return this.http.get<Lesson[]>('/api/lessons', {
+            params: {
+                pageSize: "10000",
+                courseId: courseId.toString()
+            }
+        })
+            .pipe(
+                map(res => res["payload"]),
+                shareReplay()
+            );
+    }
 
-  searchLessons(search: string): Observable<Lesson[]> {
-    return this.http
-      .get<Lesson[]>('/api/lessons', {
-        params: {
-          filter: search,
-          pageSize: '20'
-        }
-      }).pipe(
-        map(res => res['payload']),
-        shareReplay(),
-      )
-  }
+    loadAllCourses(): Observable<Course[]> {
+        return this.http.get<Course[]>("/api/courses")
+            .pipe(
+                map(res => res["payload"]),
+                shareReplay()
+            );
+    }
+
+
+    saveCourse(courseId:string, changes: Partial<Course>):Observable<any> {
+        return this.http.put(`/api/courses/${courseId}`, changes)
+            .pipe(
+                shareReplay()
+            );
+    }
+
+
+    searchLessons(search:string): Observable<Lesson[]> {
+        return this.http.get<Lesson[]>('/api/lessons', {
+            params: {
+                filter: search,
+                pageSize: "100"
+            }
+        })
+            .pipe(
+                map(res => res["payload"]),
+                shareReplay()
+            );
+    }
+
+
 }
+
+
+
+
+
+
+
