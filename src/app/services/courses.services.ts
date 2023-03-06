@@ -4,6 +4,7 @@ import { Course, sortCoursesBySeqNo } from "../model/course";
 import { HttpClient } from "@angular/common/http";
 import { catchError, map, shareReplay, tap } from "rxjs/operators";
 import { MessagesService } from "./messages.service";
+import { Lesson } from "../model/lesson";
 
 @Injectable({ providedIn: "root" })
 export class CoursesService {
@@ -29,5 +30,18 @@ export class CoursesService {
         return throwError(err);
       })
     );
+  }
+
+  searchLessons(search: string): Observable<Lesson[]> {
+    return this.http
+      .get<Lesson[]>('/api/lessons', {
+        params: {
+          filter: search,
+          pageSize: '20'
+        }
+      }).pipe(
+        map(res => res['payload']),
+        shareReplay(),
+      )
   }
 }
